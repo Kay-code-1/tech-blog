@@ -1,8 +1,10 @@
 const router = require('express').Router();
+//const { where } = require("sequelize/types");
 const { Post, Comment, User } = require('../models/');
+const withAuth = require('../utils/auth');
 
 // get all posts for homepage
-router.get('/', async (req, res) => {
+router.get('/', withAuth, async (req, res) => {
   try {
     const postData = await Post.findAll({
       include: [User],
@@ -17,11 +19,18 @@ router.get('/', async (req, res) => {
 });
 
 // get single post
-router.get('/post/:id', async (req, res) => {
+router.get('/post/:id', withAuth, async (req, res) => {
   try {
-    const postData = await Post.findByPk(
-      // TODO: YOUR CODE HERE
-    );
+    const postData = await Post.findByPk(req.params.id, {
+      include: [{
+        model: Comment,
+        as: 'Comments',
+        include: [{
+          model: User,
+          as: 'User'
+        }]
+      }] 
+    });
 
     if (postData) {
       const post = postData.get({ plain: true });

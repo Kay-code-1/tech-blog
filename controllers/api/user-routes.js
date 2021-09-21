@@ -1,32 +1,27 @@
-const router = require('express').Router();
-const { User } = require('../../models');
+const router = require("express").Router();
+const { User } = require("../../models");
 
 // URL: /api/user
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const newUser = await User.create({
-      // TODO: SET USERNAME TO USERNAME SENT IN REQUEST
-
-      // TOD: SET PASSWORD TO PASSWORD SENT IN REQUEST
+      username: req.body.username,
+      password: req.body.password,
     });
 
     req.session.save(() => {
-      // TODO: SET USERID userId IN REQUEST SESSION TO ID RETURNED FROM DATABASE
-
-      // TODO: SET USERNAME username IN REQUEST SESSION TO USERNAME RETURNED FROM DATABASE
-
-      // TODO: SET LOGGEDIN loggedIn TO TRUE IN REQUEST SESSION
-
-      res.json(newUser);
+      req.session.userId = newUser.id;
+      req.session.username = newUser.username;
+      req.session.loggedIn = true;
+      res.status(200).json(newUser);
     });
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-
 // URL: /api/user/login
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({
       where: {
@@ -35,32 +30,30 @@ router.post('/login', async (req, res) => {
     });
 
     if (!user) {
-      res.status(400).json({ message: 'No user account found!' });
+      res.status(400).json({ message: "No user account found!" });
       return;
     }
 
     const validPassword = user.checkPassword(req.body.password);
 
     if (!validPassword) {
-      res.status(400).json({ message: 'No user account found!' });
+      res.status(400).json({ message: "No user account found!" });
       return;
     }
 
     req.session.save(() => {
-      // TODO: SET USERID userId IN REQUEST SESSION TO ID RETURNED FROM DATABASE
+      req.session.userId = user.id;
+      req.session.username = user.username;
+      req.session.loggedIn = true;
 
-      // TODO: SET USERNAME username IN REQUEST SESSION TO USERNAME RETURNED FROM DATABASE
-
-      // TODO: SET LOGGEDIN loggedIn TO TRUE IN REQUEST SESSION
-
-      res.json({ user, message: 'You are now logged in!' });
+      res.json({ user, message: "You are now logged in!" });
     });
   } catch (err) {
-    res.status(400).json({ message: 'No user account found!' });
+    res.status(400).json({ message: "No user account found!" });
   }
 });
 
-router.post('/logout', (req, res) => {
+router.post("/logout", (req, res) => {
   if (req.session.loggedIn) {
     req.session.destroy(() => {
       res.status(204).end();
