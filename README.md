@@ -9,6 +9,7 @@ Tech-blog is a CMS-style blog where developers can publish their blog posts and 
 > HTML
 > CSS
 > JavaScript
+> MySQL
 > Node.js
     > bcrypt
     > connect-session-sequelize
@@ -17,4 +18,3 @@ Tech-blog is a CMS-style blog where developers can publish their blog posts and 
     > express-handlebars
     > express-session
     > sequelize
-> MySQL
