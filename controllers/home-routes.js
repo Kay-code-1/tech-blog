@@ -4,10 +4,15 @@ const { Post, Comment, User } = require('../models/');
 const withAuth = require('../utils/auth');
 
 // get all posts for homepage
-router.get('/', withAuth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const postData = await Post.findAll({
-      include: [User],
+      include: [
+        {
+          model: User,
+          as: 'User',
+        },
+      ],
     });
 
     const posts = postData.map((post) => post.get({ plain: true }));
@@ -22,14 +27,22 @@ router.get('/', withAuth, async (req, res) => {
 router.get('/post/:id', withAuth, async (req, res) => {
   try {
     const postData = await Post.findByPk(req.params.id, {
-      include: [{
-        model: Comment,
-        as: 'Comments',
-        include: [{
+      include: [
+        {
+          model: Comment,
+          as: 'Comments',
+          include: [
+            {
+              model: User,
+              as: 'User',
+            },
+          ],
+        },
+        {
           model: User,
-          as: 'User'
-        }]
-      }] 
+          as: 'User',
+        },
+      ],
     });
 
     if (postData) {

@@ -15,16 +15,18 @@ const PORT = process.env.PORT || 3001;
 const sequelize = require('./config/config');
 // Session store using sequelize to store session data
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
+// Default timeout 1 hour
+const timeout = process.env.TIMEOUT || 3600;
 
 // Set up session middleware
 const sess = {
   secret: 'Super secret secret',
-  cookie: {},
+  cookie: { maxAge: timeout * 1000 }, 
   resave: false,
   saveUninitialized: true,
   store: new SequelizeStore({
-    db: sequelize
-  })
+    db: sequelize,
+  }),
 };
 app.use(session(sess));
 
